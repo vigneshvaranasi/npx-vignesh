@@ -36,9 +36,9 @@ const questions = [
                         text: ' Downloading Resume',
                         spinner: cliSpinners.material,
                     }).start();
-                    let pipe = request('https://vigneshvaranasi.me/').pipe(fs.createWriteStream('./vignesh-resume.html'));
+                    let pipe = request('https://vigneshvaranasi.me/Vignesh%20Varanasi%20Resume.pdf').pipe(fs.createWriteStream('./Vignesh Varanasi Resume.pdf'));
                     pipe.on("finish", function () {
-                        let downloadPath = path.join(process.cwd(), 'vignesh-resume.html')
+                        let downloadPath = path.join(process.cwd(), 'Vignesh Varanasi Resume.pdf')
                         console.log(`\nResume Downloaded at ${downloadPath} \n`);
                         open(downloadPath)
                         loader.stop();
