@@ -36,7 +36,7 @@ const questions = [
                         text: ' Downloading Resume',
                         spinner: cliSpinners.material,
                     }).start();
-                    let pipe = request('https://vigneshvaranasi.me/Vignesh%20Varanasi%20Resume.pdf').pipe(fs.createWriteStream('./Vignesh Varanasi Resume.pdf'));
+                    let pipe = request('https://vigneshvaranasi.in/assets/Vignesh%20Varanasi%20Resume-bPOO6lJR.pdf').pipe(fs.createWriteStream('./Vignesh Varanasi Resume.pdf'));
                     pipe.on("finish", function () {
                         let downloadPath = path.join(process.cwd(), 'Vignesh Varanasi Resume.pdf')
                         console.log(`\nResume Downloaded at ${downloadPath} \n`);
@@ -62,7 +62,7 @@ const data = {
         .bold("PVPSIT")}`,
     github: chalk.gray("https://github.com/") + chalk.green("vigneshvaranasi"),
     linkedin: chalk.gray("https://linkedin.com/in/") + chalk.blue("vigneshvaranasi"),
-    web: chalk.cyan("https://vigneshvaranasi.me"),
+    web: chalk.cyan("https://vigneshvaranasi.in"),
     npx: chalk.red("npx") + " " + chalk.white("vignesh"),
 
     labelWork: chalk.white.bold("  "),

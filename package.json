@@ -1,6 +1,6 @@
 {
   "name": "vignesh",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "A personal card for Vignesh Varanasi",
   "main": "card.js",
   "bin": {
