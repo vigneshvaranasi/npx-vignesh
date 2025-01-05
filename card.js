@@ -1,26 +1,27 @@
 #!/usr/bin/env node
 
-'use strict'
+'use strict';
 
-const boxen = require("boxen");
-const chalk = require("chalk");
-const inquirer = require("inquirer");
-const clear = require("clear");
-const open = require("open");
-const fs = require('fs');
-const request = require('request');
-const path = require('path');
-const ora = require('ora');
-const cliSpinners = require('cli-spinners');
+import boxen from "boxen";
+import chalk from "chalk";
+
+import { createPromptModule } from "inquirer";
+import clear from "clear";
+import open from "open";
+import { createWriteStream } from 'fs';
+import axios from 'axios';
+import { join } from 'path';
+import ora from 'ora';
+
 clear();
 
-const prompt = inquirer.createPromptModule();
+const prompt = createPromptModule();
 
 const questions = [
     {
         type: "list",
         name: "action",
-        message: "What you want to do?",
+        message: "What do you want to do?",
         choices: [
             {
                 name: `Send me an ${chalk.green.bold("email")}?`,
@@ -31,18 +32,34 @@ const questions = [
             },
             {
                 name: `Download my ${chalk.magentaBright.bold("Resume")}?`,
-                value: () => {
+                value: async () => {
                     const loader = ora({
-                        text: ' Downloading Resume',
-                        spinner: cliSpinners.material,
+                        text: 'Downloading Resume...',
+                        spinner: 'dots', // Replaced 'material' with a generic spinner name
                     }).start();
-                    let pipe = request('https://vigneshvaranasi.in/assets/Vignesh%20Varanasi%20Resume-bPOO6lJR.pdf').pipe(fs.createWriteStream('./Vignesh Varanasi Resume.pdf'));
-                    pipe.on("finish", function () {
-                        let downloadPath = path.join(process.cwd(), 'Vignesh Varanasi Resume.pdf')
-                        console.log(`\nResume Downloaded at ${downloadPath} \n`);
-                        open(downloadPath)
+
+                    try {
+                        const url = 'https://vigneshvaranasi.in/assets/Vignesh%20Varanasi%20Resume-bPOO6lJR.pdf';
+                        const response = await axios.get(url, { responseType: 'stream' }); // Fixed axios usage
+                        const downloadPath = join(process.cwd(), 'Vignesh Varanasi Resume.pdf');
+                        const writer = createWriteStream(downloadPath);
+
+                        response.data.pipe(writer);
+
+                        writer.on("finish", () => {
+                            console.log(`\nResume downloaded at ${downloadPath}\n`);
+                            open(downloadPath);
+                            loader.stop();
+                        });
+
+                        writer.on("error", (err) => {
+                            console.error(`\nError downloading resume: ${err.message}\n`);
+                            loader.stop();
+                        });
+                    } catch (error) {
+                        console.error(`\nError: ${error.message}\n`);
                         loader.stop();
-                    });
+                    }
                 }
             },
             {
@@ -56,10 +73,8 @@ const questions = [
 ];
 
 const data = {
-    name: chalk.bold.green("                 Vignesh Varanasi"),
-    work: `${chalk.white("Currently student at ")} ${chalk
-        .hex("#2b82b2")
-        .bold("PVPSIT")}`,
+    name: chalk.green.bold("                   Vignesh Varanasi"),
+    work: `${chalk.white("Currently student at ")} ${chalk.hex("#2b82b2").bold("PVPSIT")}`,
     github: chalk.gray("https://github.com/") + chalk.green("vigneshvaranasi"),
     linkedin: chalk.gray("https://linkedin.com/in/") + chalk.blue("vigneshvaranasi"),
     web: chalk.cyan("https://vigneshvaranasi.in"),
@@ -83,16 +98,10 @@ const me = boxen(
         ``,
         `${data.labelCard}  ${data.npx}`,
         ``,
-        `${chalk.italic(
-            "I am currently looking for new opportunities,"
-        )}`,
-        `${chalk.italic("my inbox is always open. Whether you have a")}`,
-        `${chalk.italic(
-            "question or just want to say hi, I will try "
-        )}`,
-        `${chalk.italic(
-            "my best to get back to you!"
-        )}`
+        `I am currently looking for new opportunities,`,
+        `my inbox is always open. Whether you have a`,
+        `question or just want to say hi, I will try `,
+        `my best to get back to you!`
     ].join("\n"),
     {
         margin: 1,
@@ -104,12 +113,12 @@ const me = boxen(
 );
 
 console.log(me);
+
 const tip = [
-    `Tip: Try ${chalk.cyanBright.bold(
-        "cmd/ctrl + click"
-    )} on the links above`,
+    `Tip: Try ${chalk.cyanBright.bold("cmd/ctrl + click")} on the links above`,
     '',
 ].join("\n");
+
 console.log(tip);
 
 prompt(questions).then(answer => answer.action());
